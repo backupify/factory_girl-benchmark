@@ -18,7 +18,7 @@ module FactoryGirl
 
     class << self
       # Example usage
-      def benchmark!
+      def benchmark!(max = 20)
         # Install
         FactoryGirl.singleton_class.prepend(FactoryGirl::Benchmark)
 
@@ -33,7 +33,7 @@ module FactoryGirl
         end
 
         # Report
-        FactoryGirl::Benchmark.report
+        FactoryGirl::Benchmark.report(max)
       end
 
       def benchmarks
@@ -64,22 +64,22 @@ module FactoryGirl
         @benching = o
       end
 
-      def report
+      def report(max = 20)
         puts 'Most frequent'
         r = benchmarks.reduce([]) do |m, (k, _)|
           m << { key: k, count: benchmarks[k].size }
         end.sort {|a,b| b[:count] <=> a[:count]}
-        print_report(r)
+        print_report(r, max)
 
         puts 'Slowest instances'
         r = benchmarks.each_value.to_a.flatten.sort {|a,b| b[:bm] <=> a[:bm]}
-        print_report(r)
+        print_report(r, max)
 
         puts 'Slowest total'
         r = benchmarks.reduce([]) do |m, (k, _)| 
           m << { key: k, count: benchmarks[k].size, total_time: benchmarks[k].reduce(0) {|sum, bm| sum + bm[:bm]} }
         end.sort {|a,b| b[:total_time] <=> a[:total_time]}
-        print_report(r)
+        print_report(r, max)
 
         puts 'Slowest average'
         r = benchmarks.reduce([]) do |m, (k, _)| 
@@ -87,12 +87,12 @@ module FactoryGirl
           count = benchmarks[k].size
           m << { key: k, avg: total_time.to_f/count, count: count, total_time: total_time }
         end.sort {|a,b| b[:avg] <=> a[:avg]}
-        print_report(r)
+        print_report(r, max)
       end
 
-      def print_report(arr)
+      def print_report(arr, max = 20)
         require 'colorize'
-        arr.first(20).map {|h| puts "\t#{h}".colorize(color)}
+        arr.first(max).map {|h| puts "\t#{h}".colorize(color)}
         puts
       end
 
