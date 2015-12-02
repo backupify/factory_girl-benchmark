@@ -5,7 +5,7 @@ benchmark your top-level factory_girl factories
 ## Installation
 
 ```rb
-gem 'factory_girl-benchmark'
+gem 'factory_girl-benchmark', require: false
 ```
 
 ## Usage
